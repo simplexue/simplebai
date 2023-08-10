@@ -1,0 +1,16 @@
+{
+  "id": "4205394",
+  "name": "simplebai",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "7450641",
+      "name": "搜索",
+      "font_class": "sousuo",
+      "unicode": "e665",
+      "unicode_decimal": 58981
+    }
+  ]
+}
