@@ -5,7 +5,7 @@
         <div class="nav-item">生活</div>
         <div class="nav-item">服务</div>
         <div class="nav-item">学习</div>
-        <div class="nav-item">chat</div>
+        <div class="nav-item" @click="toChat()">chat</div>
       </div>
       <div class="title">简单白-校园生活</div>
       <div class="auth-box">
@@ -30,7 +30,10 @@ export default {
     },
     toLogin() {
       this.$router.push('/login')
-    }
+    },
+    toChat() {
+      this.$router.push('/chatai')
+    },
   },
 }
 </script>
