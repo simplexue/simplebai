@@ -1,11 +1,12 @@
 const { defineConfig } = require('@vue/cli-service')
+const path = require('path'); // 引入path模块
 module.exports = defineConfig({
   publicPath: './', // 添加这一行来设置静态文件路径
   transpileDependencies: true,
   pluginOptions: {
     'style-resources-loader': {
-      preProcessor: 'scss', // or 'less', or 'stylus'
-      patterns: [] // Here you can add the paths to your global style files
+      preProcessor: 'less', // or 'scss', or 'stylus'
+      patterns: [path.resolve(__dirname, './src/assets/less/global.less')] // 添加global.less的路径
     }
   },
   css: {

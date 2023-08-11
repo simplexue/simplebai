@@ -50,7 +50,7 @@ export default {
   }
 .banner {
   width: 100%;
-  height: 60vh;
+  height: 80vh;
   background:
       linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.43)),
       url("~@/assets/banner.jpg") center bottom no-repeat;

@@ -1,30 +1,33 @@
 <template>
-  <div class="header-box">
-    <div class="header">
-      <div class="nav">
-        <div class="nav-item">生活</div>
-        <div class="nav-item">服务</div>
-        <div class="nav-item">学习</div>
-        <div class="nav-item" @click="toChat()">chat</div>
-      </div>
-      <div class="title">简单白-校园生活</div>
-      <div class="auth-box">
-        <div class="auth-btn" @click="toLogin()">登录</div>
-        <div class="auth-btn" @click="toLogin()">注册</div>
-      </div>
-      <a-switch default-checked @change="onChange" />
+  <div class="header" :class="{ 'top-view': atTop, 'other-view': !atTop }">
+    <div class="nav">
+      <div class="nav-item">生活</div>
+      <div class="nav-item">服务</div>
+      <div class="nav-item">学习</div>
+      <div class="nav-item" @click="toChat()">chat</div>
     </div>
+    <div class="title">简单白-校园生活</div>
+    <div class="auth-box">
+      <div class="auth-btn" @click="toLogin()">登录</div>
+      <div class="auth-btn" @click="toLogin()">注册</div>
+    </div>
+    <a-switch default-checked @change="onChange" />
   </div>
-
 </template>
 
 <script>
 export default {
   name: 'TopHeader',
   data() {
-    return {};
+    return {
+      atTop: true,  // 初始假设用户在顶部
+    };
   },
   methods: {
+    checkScroll() {
+      // 当滚动距离超过一定值时，改变atTop的值
+      this.atTop = window.pageYOffset <= 0;
+    },
     onChange(checked) {
       console.log(`a-switch to ${checked}`);
     },
@@ -35,29 +38,46 @@ export default {
       this.$router.push('/chatai')
     },
   },
+  mounted() {
+    window.addEventListener('scroll', this.checkScroll);
+  },
+  beforeDestroy() {
+    window.removeEventListener('scroll', this.checkScroll);
+  },
 }
 </script>
 
 <style lang="less" scoped>
-.header-box {
-  height: 5rem;
-}
+//.header-box {
+//  height: 5rem;
+//}
 .header {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   transition: transform .2s;
-  background-color: #FFFFFF;
   height: 5rem;
-  border-bottom: 1px solid rgba(168,168,168,0.2);
-  box-shadow:  9px 9px 24px #f7f7f7;
+  color: #FFFFFF;
+  font-weight: bold;
   font-size: 1.167rem;
+  transition: all 0.5s ease-in-out;
   display: flex;
   flex-direction: row;
-  justify-content: flex-start;
+  justify-content: space-between;
   align-items: center;
   overflow: hidden;
+}
+.top-view {
+  /* 顶部视角样式，比如背景色和文字颜色 */
+
+}
+
+.other-view {
+  /* 非顶部视角样式，比如背景色和文字颜色 */
+  background-color: #FFFFFF;
+  //box-shadow:  9px 9px 24px #f7f7f7;
+  color: #df5000;
 }
 .nav {
   width: 30%;
