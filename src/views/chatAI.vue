@@ -69,13 +69,15 @@
         </div>
       </div>
       <div class="chat-container">
-        <div class="chat-request-box f-r">
-          <div class="chat-user-img"></div>
-          <div class="chat-request-text">今天天气好吗？新的一天，希望你能够鼓励我！</div>
-        </div>
-        <div class="chat-answer-box f-r">
-          <div class="chat-ai-img"></div>
-          <div class="chat-request-text">很高兴回答您的问题！今天的天气很好，希望您在新的一天能够有新的收获！</div>
+        <div class="chat-dialog-box" v-for="(item) in dialogData" :key="item.id">
+          <div class="chat-request-box f-r">
+            <div class="chat-user-img"></div>
+            <div class="chat-request-text">{{ item.request }}</div>
+          </div>
+          <div class="chat-answer-box f-r">
+            <div class="chat-ai-img"></div>
+            <div class="chat-request-text">{{ item.answer }}</div>
+          </div>
         </div>
       </div>
 
@@ -107,6 +109,17 @@ export default {
   data() {
     return {
       requestText: '',
+      OPENAI_API_KEY: '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',
+      dialogData: [
+        {
+          request: 'hi',
+          answer: 'hi!',
+        },
+        {
+          request: '你好',
+          answer: '你好呀!',
+        }
+      ],
     }
   },
   methods: {
@@ -114,13 +127,35 @@ export default {
       console.log(`selected ${value}`);
     },
     click() {
-      this.$axios.get('/hello')
-          .then(response => {
-            console.log(response.data);
-          })
-          .catch(error => {
-            console.log(error);
-          });
+      this.$axios.post('https://api.openai.com/v1/chat/completions', {
+        model: 'gpt-3.5-turbo',
+        messages: [{role: 'user', content: this.requestText}],
+        temperature: 0.7
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + this.OPENAI_API_KEY
+        }
+      }).then(response => {
+        console.log(response.data);
+        console.log('返回的值是：',response.data.choices[0].message.content)
+
+        // 将请求和答案一起推入dialogData
+        this.dialogData.push({
+          request: this.requestText,
+          answer: response.data.choices[0].message.content
+        });
+
+        console.log('dialogData=',this.dialogData)
+
+        // 清空输入框
+        this.requestText = '';
+      }).catch(error => {
+        console.log(error);
+      });
+
+
+
     },
     autoGrow() {
       this.$refs.myTextarea.style.height = 'auto';
@@ -273,7 +308,7 @@ export default {
   .chat-request-box {
     width: 100%;
     height: 10%;
-    padding: 0 5%;
+    padding: 10px 5%;
     .chat-user-img {
       margin-right: 10px;
       background-color: #BDDBF3;
@@ -285,7 +320,7 @@ export default {
   .chat-answer-box {
     width: 100%;
     height: 10%;
-    padding: 0 5%;
+    padding: 10px 5%;
     background-color: rgba(172,214,231,0.4);
     .chat-ai-img {
       margin-right: 10px;
@@ -303,7 +338,7 @@ export default {
 .refresh-btn-box {
   position: absolute;
   top: -50px;
-  left: 70px;
+  right: 80px;
   width: 40px;
   height: 40px;
   background-color: #3500E0;
@@ -312,6 +347,7 @@ export default {
   flex-direction: row;
   justify-content: center;
   align-items: center;
+  cursor: pointer;
 }
 .refresh-icon {
   color: #FFFFFF;
@@ -350,7 +386,7 @@ export default {
     align-items: center;
   }
   .chat-input-text:focus {
-    //outline: none;
+    outline: none;
   }
   .submit-btn {
     margin: 0 20px;
@@ -364,6 +400,10 @@ export default {
     flex-direction: row;
     justify-content: center;
     align-items: center;
+    cursor: pointer;
+  }
+  .submit-btn:hover {
+    background-color: #702020;
   }
 }
 
