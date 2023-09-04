@@ -6,6 +6,34 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "658956",
+      "name": "图片",
+      "font_class": "tupian",
+      "unicode": "e67f",
+      "unicode_decimal": 59007
+    },
+    {
+      "icon_id": "2815724",
+      "name": "视频播放",
+      "font_class": "shipinbofang",
+      "unicode": "e601",
+      "unicode_decimal": 58881
+    },
+    {
+      "icon_id": "6196896",
+      "name": "表情",
+      "font_class": "biaoqing",
+      "unicode": "e648",
+      "unicode_decimal": 58952
+    },
+    {
+      "icon_id": "11372673",
+      "name": "话题",
+      "font_class": "huati",
+      "unicode": "e8b1",
+      "unicode_decimal": 59569
+    },
+    {
       "icon_id": "162882",
       "name": "设置",
       "font_class": "shezhi",

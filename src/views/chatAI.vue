@@ -72,11 +72,11 @@
         <div class="chat-dialog-box" v-for="(item) in dialogData" :key="item.id">
           <div class="chat-request-box f-r">
             <div class="chat-user-img"></div>
-            <div class="chat-request-text">{{ item.request }}</div>
+            <div class="chat-request-text" v-html="item.request"></div>
           </div>
           <div class="chat-answer-box f-r">
             <div class="chat-ai-img"></div>
-            <div class="chat-request-text">{{ item.answer }}</div>
+            <div class="chat-request-text" v-html="item.answer"></div>
           </div>
         </div>
       </div>
@@ -105,31 +105,45 @@
 </template>
 
 <script>
+import { Remarkable } from 'remarkable';
+import  hljs from 'highlight.js';
+
 export default {
   data() {
     return {
+      md: new Remarkable(),
       requestText: '',
+      contextArray: [],
       OPENAI_API_KEY: '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',
-      dialogData: [
-        {
-          request: 'hi',
-          answer: 'hi!',
-        },
-        {
-          request: '你好',
-          answer: '你好呀!',
-        }
-      ],
+      dialogData: JSON.parse(localStorage.getItem('dialogData')) || [],
     }
+  },
+  computed: {
   },
   methods: {
     handleChange(value) {
       console.log(`selected ${value}`);
     },
     click() {
+      console.log('Before request, dialogData:', this.dialogData);
+      // 获取最后6条对话记录
+      let recentDialogs = this.dialogData.slice(-6);
+
+      // 创建一个新的数组，包含过去的对话和当前的请求
+      let messages = recentDialogs.map(dialog => {
+        return [
+          {role: 'user', content: dialog.request},
+          {role: 'assistant', content: dialog.answer}
+        ];
+      }).flat();
+
+      // 添加当前的请求
+      messages.push({role: 'user', content: this.requestText});
+
+      // 发送POST请求
       this.$axios.post('https://api.openai.com/v1/chat/completions', {
         model: 'gpt-3.5-turbo',
-        messages: [{role: 'user', content: this.requestText}],
+        messages: messages,
         temperature: 0.7
       }, {
         headers: {
@@ -139,11 +153,18 @@ export default {
       }).then(response => {
         console.log(response.data);
         console.log('返回的值是：',response.data.choices[0].message.content)
+        // Convert GPT-3's output from Markdown to HTML
+        let text = response.data.choices[0].message.content;
 
+        // Highlight code in the text
+        text = hljs.highlightAuto(text).value;
+
+        // Render the text as HTML
+        const html = this.md.render(text);
         // 将请求和答案一起推入dialogData
         this.dialogData.push({
           request: this.requestText,
-          answer: response.data.choices[0].message.content
+          answer: html
         });
 
         console.log('dialogData=',this.dialogData)
@@ -153,14 +174,14 @@ export default {
       }).catch(error => {
         console.log(error);
       });
-
-
-
+      // 在对话记录被更新之后，将其存储到LocalStorage
+      localStorage.setItem('dialogData', JSON.stringify(this.dialogData));
     },
     autoGrow() {
       this.$refs.myTextarea.style.height = 'auto';
       this.$refs.myTextarea.style.height = (this.$refs.myTextarea.scrollHeight) + 'px';
     }
+
   },
   mounted() {
     this.autoGrow();
@@ -229,7 +250,7 @@ export default {
     width: 100%;
   }
   .chat-title-item {
-    background-color: rgba(172,214,231,0.2);
+    background-color: #FFFFFF;
     width: 100%;
     height: 60px;
     padding: 0 5%;
@@ -245,6 +266,10 @@ export default {
       width: 20%;
       text-align: right;
     }
+  }
+  .chat-title-item:hover {
+    background-color: rgba(172,214,231,0.2);
+    cursor: pointer;
   }
 }
 .chat-user-box {
