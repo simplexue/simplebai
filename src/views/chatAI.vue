@@ -7,34 +7,10 @@
       </div>
       <div class="chat-title-box">
         <div class="chat-title">会话</div>
-        <div class="chat-title-list f-col">
+        <div class="chat-title-list f-col" v-for="(value,index) in QuestionList" :key="index">
           <div class="chat-title-item">
             <span class="iconfont icon-shouye"></span>
-            <span class="chat-title-text">小红书</span>
-            <span class="chat-title-tools">
-              <span class="iconfont icon-tianxie p-r-10"></span>
-              <span class="iconfont icon-shanchu"></span>
-            </span>
-          </div>
-          <div class="chat-title-item">
-            <span class="iconfont icon-shouye"></span>
-            <span class="chat-title-text">小红书</span>
-            <span class="chat-title-tools">
-              <span class="iconfont icon-tianxie p-r-10"></span>
-              <span class="iconfont icon-shanchu"></span>
-            </span>
-          </div>
-          <div class="chat-title-item">
-            <span class="iconfont icon-shouye"></span>
-            <span class="chat-title-text">小红书</span>
-            <span class="chat-title-tools">
-              <span class="iconfont icon-tianxie p-r-10"></span>
-              <span class="iconfont icon-shanchu"></span>
-            </span>
-          </div>
-          <div class="chat-title-item">
-            <span class="iconfont icon-shouye"></span>
-            <span class="chat-title-text">小红书</span>
+            <span class="chat-title-text">{{ value.title }}</span>
             <span class="chat-title-tools">
               <span class="iconfont icon-tianxie p-r-10"></span>
               <span class="iconfont icon-shanchu"></span>
@@ -116,6 +92,10 @@ export default {
       contextArray: [],
       OPENAI_API_KEY: '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',
       dialogData: JSON.parse(localStorage.getItem('dialogData')) || [],
+      QuestionList: [
+        {title:'小红书'},
+        {title:'小白书'},
+      ],
     }
   },
   computed: {
@@ -201,7 +181,7 @@ export default {
 }
 .content-left {
   background-color: #FFFFFF;
-  width: 20%;
+  width: 15%;
   height: 100%;
   box-shadow: 0px 3px 6px gray;
   z-index: 9999;
@@ -295,7 +275,7 @@ export default {
 /*右侧----------------start*/
 .content-right {
   background-color: #42b983;
-  width: 80%;
+  width: 85%;
   height: 100%;
 }
 .chat-header {
