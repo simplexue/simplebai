@@ -2,7 +2,23 @@
   <div class="content">
     <div class="content-left">
       <div class="top-btn-box">
-        <div class="add-btn">+</div>
+        <div class="add-btn" @click="showModal()">+</div>
+        <el-button type="primary" @click="showModal">
+          Open Modal with async logic
+        </el-button>
+        <el-dialog
+            :visible.sync="open"
+            :title="'Title'"
+            :before-close="handleCancel"
+        >
+          <p>{{ modalText }}</p>
+          <span slot="footer" class="dialog-footer">
+            <el-button @click="handleCancel">Cancel</el-button>
+            <el-button type="primary" :loading="confirmLoading" @click="handleOk">
+              Confirm
+            </el-button>
+          </span>
+        </el-dialog>
         <div class="expand-btn">&lt;&gt;</div>
       </div>
       <div class="chat-title-box">
@@ -45,7 +61,7 @@
         </div>
       </div>
       <div class="chat-container">
-        <div class="chat-dialog-box" v-for="(item) in dialogData" :key="item.id">
+        <div class="chat-dialog-box" v-for="(item,index) in dialogData" :key="index">
           <div class="chat-request-box f-r">
             <div class="chat-user-img"></div>
             <div class="chat-request-text" v-html="item.request"></div>
@@ -56,42 +72,52 @@
           </div>
         </div>
       </div>
-
+<!--      对话输入框-->
       <div class="chat-input">
+<!--        刷新按钮-->
         <div class="refresh-btn-box">
           <div class="iconfont icon-shuaxin refresh-icon"></div>
         </div>
+        <div class="clear-btn" @click="clearClick()">清空</div>
         <div class="chat-input-box">
           <textarea placeholder="请输入文本内容"
                     type="text"
                     class="chat-input-text"
                     v-model="requestText"
                     @input="autoGrow"
+                    @keydown.enter.prevent="submitClick"
                     ref="myTextarea"
           ></textarea>
-          <div class="iconfont icon-jiantouyou submit-btn" @click="click()"></div>
+          <div class="iconfont icon-jiantouyou submit-btn" @click="submitClick()"></div>
         </div>
       </div>
-
-
-
     </div>
-
+<!--    弹窗-->
+    <add-title-pop-up ref="addTitlePopUp"></add-title-pop-up>
   </div>
 </template>
 
 <script>
-import { Remarkable } from 'remarkable';
-import  hljs from 'highlight.js';
-
+import addTitlePopUp from "@/components/PopUpWindows/addTitlePopUp";
+import AddTitlePopUp from "@/components/PopUpWindows/addTitlePopUp";
 export default {
+  components: {AddTitlePopUp},
   data() {
     return {
-      md: new Remarkable(),
+      open: false,
+      confirmLoading: false,
+      modalText: 'Content of the modal',
+
       requestText: '',
       contextArray: [],
-      OPENAI_API_KEY: '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',
+      OPENAI_API_KEY: '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',
       dialogData: JSON.parse(localStorage.getItem('dialogData')) || [],
+      // dialogData: [
+      //   {
+      //     request: '你好！',
+      //     answer: '你也好呀'
+      //   },
+      // ],
       QuestionList: [
         {title:'小红书'},
         {title:'小白书'},
@@ -99,12 +125,35 @@ export default {
     }
   },
   computed: {
+    addTitlePopUp,
   },
   methods: {
+    showModal() {
+      this.open = true;
+    },
+    handleOk() {
+      this.modalText = 'The modal will be closed after two seconds';
+      this.confirmLoading = true;
+      setTimeout(() => {
+        this.open = false;
+        this.confirmLoading = false;
+      }, 2000);
+    },
+    handleCancel() {
+      console.log('Clicked cancel button');
+      this.open = false;
+    },
+
     handleChange(value) {
       console.log(`selected ${value}`);
     },
-    click() {
+    addClick(record) {
+      this.$refs.addTitlePopUp.show(record)
+    },
+    clearClick() {
+
+    },
+    submitClick() {
       console.log('Before request, dialogData:', this.dialogData);
       // 获取最后6条对话记录
       let recentDialogs = this.dialogData.slice(-6);
@@ -136,15 +185,10 @@ export default {
         // Convert GPT-3's output from Markdown to HTML
         let text = response.data.choices[0].message.content;
 
-        // Highlight code in the text
-        text = hljs.highlightAuto(text).value;
-
-        // Render the text as HTML
-        const html = this.md.render(text);
         // 将请求和答案一起推入dialogData
         this.dialogData.push({
           request: this.requestText,
-          answer: html
+          answer: text
         });
 
         console.log('dialogData=',this.dialogData)
@@ -157,6 +201,7 @@ export default {
       // 在对话记录被更新之后，将其存储到LocalStorage
       localStorage.setItem('dialogData', JSON.stringify(this.dialogData));
     },
+    // 自动增加对话框高度
     autoGrow() {
       this.$refs.myTextarea.style.height = 'auto';
       this.$refs.myTextarea.style.height = (this.$refs.myTextarea.scrollHeight) + 'px';
