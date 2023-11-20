@@ -110,7 +110,7 @@ export default {
 
       requestText: '',
       contextArray: [],
-      OPENAI_API_KEY: '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',
+      OPENAI_API_KEY: 'sk-fsfsfsfsfssfsfsfsfsfsdfsfsfsfsdfsdfsFQRQn',
       dialogData: JSON.parse(localStorage.getItem('dialogData')) || [],
       // dialogData: [
       //   {
